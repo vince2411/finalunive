@@ -274,9 +274,6 @@ async function loadDashboardData() {
   
   // Load initial data
   loadSectionData('section-dashboard');
-  
-  // Seed demo data if empty
-  await seedDemoData();
 }
 
 function updateRateDisplay(info) {
@@ -1668,8 +1665,8 @@ window.adminApp = {
     });
   },
   
-  markDebtPaid: (id) => {
-    confirmDialog('Confirmar pago', '¿Confirmas que esta deuda fue pagada?', async () => {
+  markDebtPaid: async (id) => {
+    confirmDialog('Confirmar Pago', '¿Marcar esta deuda como pagada?', async () => {
       const debtors = await getCollection('morosos');
       const debtor = debtors.find(d => d.id === id);
       if (!debtor) return;
@@ -1681,6 +1678,26 @@ window.adminApp = {
         amountUsd: debtor.amountUsd,
         method: 'transferencia'
       });
+
+      // Route to specific collections based on concept
+      if (debtor.concept === 'inscripcion') {
+        await addDocument('inscripciones', {
+          playerName: debtor.name,
+          category: 'Asignar', // Cannot know from debtor alone, placeholder
+          amountUsd: debtor.amountUsd,
+          status: 'pagada',
+          paymentMethod: 'transferencia'
+        });
+      } else if (debtor.concept === 'uniforme' || debtor.concept === 'uniformes') {
+        await addDocument('uniformes', {
+          playerName: debtor.name,
+          category: 'Todas',
+          combo: 'Personalizado',
+          size: 'TBD',
+          amountUsd: debtor.amountUsd,
+          deliveryStatus: 'pendiente'
+        });
+      }
       
       // Remove from debtors
       await deleteDocument('morosos', id);
