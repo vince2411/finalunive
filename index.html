@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universitarios FC | Academia de Fútbol Profesional</title>
+  <meta name="description" content="Formación deportiva de alto nivel para jóvenes atletas. Inscripciones abiertas en todas las categorías. Atención inmediata por chat inteligente.">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/icon-192.png" type="image/png">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/landing.css">
+  <link rel="stylesheet" href="css/chat.css">
+</head>
+<body class="landing-body">
+
+  <!-- ===== HEADER ===== -->
+  <header class="landing-header" id="landingHeader">
+    <a href="#" class="header-brand" aria-label="Universitarios FC">
+      <div class="header-logo">⚽</div>
+      <div class="header-brand-text">
+        <strong>Universitarios FC</strong>
+        <small>Academia Profesional</small>
+      </div>
+    </a>
+    
+    <nav class="landing-nav" id="desktopNav">
+      <a href="#servicios">Servicios</a>
+      <a href="#beneficios">Beneficios</a>
+      <a href="#testimonios">Testimonios</a>
+      <a href="#contacto">Contacto</a>
+      <a href="admin.html" class="nav-admin-btn">Panel Admin</a>
+    </nav>
+    
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menú de navegación">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </header>
+
+  <!-- Mobile Navigation -->
+  <nav class="mobile-nav" id="mobileNav">
+    <a href="#servicios">Servicios</a>
+    <a href="#beneficios">Beneficios</a>
+    <a href="#testimonios">Testimonios</a>
+    <a href="#contacto">Contacto</a>
+    <a href="admin.html" class="nav-admin-btn" style="text-align:center;">Panel Admin</a>
+  </nav>
+
+  <main>
+    <!-- ===== HERO SECTION ===== -->
+    <section class="hero" id="hero">
+      <div class="hero-container">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span>Temporada 2026 · Cupos abiertos</span>
+          </div>
+          
+          <h1 class="hero-title">
+            Bienvenido a<br>
+            <span class="highlight">Universitarios FC</span>
+          </h1>
+          
+          <p class="hero-description">
+            Formación deportiva integral con entrenadores profesionales, seguimiento personalizado y atención omnicanal para representantes y jugadores.
+          </p>
+          
+          <div class="hero-actions">
+            <button id="heroCtaChat" class="btn btn-primary btn-lg">
+              💬 Hablar con Atención
+            </button>
+            <a href="#servicios" class="btn btn-outline btn-lg">
+              Explorar servicios
+            </a>
+          </div>
+          
+          <div class="hero-metrics">
+            <div class="hero-metric">
+              <span class="hero-metric-value">+480</span>
+              <span class="hero-metric-label">Familias activas</span>
+            </div>
+            <div class="hero-metric">
+              <span class="hero-metric-value">92%</span>
+              <span class="hero-metric-label">Renovación anual</span>
+            </div>
+            <div class="hero-metric">
+              <span class="hero-metric-value">4.9/5</span>
+              <span class="hero-metric-label">Satisfacción</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="hero-visual">
+          <div class="hero-card-stack">
+            <div class="hero-floating">
+              <span>🟢</span> Atención en línea 24/7
+            </div>
+            
+            <div class="hero-feature-card">
+              <h3><span class="hero-feature-icon">📋</span> Inscripciones digitales</h3>
+              <p>Proceso de inscripción completo con gestión bimonetaria USD/VES y seguimiento en tiempo real.</p>
+            </div>
+            
+            <div class="hero-feature-card">
+              <h3><span class="hero-feature-icon">🤖</span> Asistente inteligente</h3>
+              <p>Bot con IA que responde consultas al instante y escala automáticamente a un asesor humano.</p>
+            </div>
+            
+            <div class="hero-feature-card">
+              <h3><span class="hero-feature-icon">📊</span> Control total</h3>
+              <p>Dashboard premium con reportes, facturación, asistencia y gestión de categorías.</p>
+            </div>
+            
+            <div class="hero-floating" style="bottom: 60px; left: -20px; top: auto; right: auto;">
+              <span>⚡</span> Respuesta en &lt;2 min
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SERVICES SECTION ===== -->
+    <section class="services" id="servicios">
+      <div class="section-label">Nuestros servicios</div>
+      <h2 class="section-heading">Todo lo que necesitas en un solo lugar</h2>
+      <p class="section-desc">
+        Gestión integral de tu experiencia en la academia, desde la inscripción hasta el seguimiento deportivo.
+      </p>
+      
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon" style="background: var(--color-primary-light); color: var(--color-primary);">📋</div>
+          <h3>Inscripciones</h3>
+          <p>Proceso de inscripción digitalizado con manejo bimonetario, comprobantes y seguimiento de estado en tiempo real.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon" style="background: var(--color-secondary-light); color: var(--color-secondary);">⚽</div>
+          <h3>Categorías</h3>
+          <p>Desde U-8 hasta Adultos y Femenino. Cada categoría con entrenadores certificados y plan de desarrollo personalizado.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon" style="background: var(--color-success-light); color: var(--color-success);">📊</div>
+          <h3>Asistencia</h3>
+          <p>Control diario de asistencia con estadísticas, alertas automáticas y reportes mensuales para representantes.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon" style="background: var(--color-warning-light); color: var(--color-warning);">🧾</div>
+          <h3>Facturación</h3>
+          <p>Sistema de facturación profesional con generación de PDF, historial de pagos y gestión bimonetaria USD/VES.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon" style="background: var(--color-error-light); color: var(--color-error);">👕</div>
+          <h3>Uniformes</h3>
+          <p>Catálogo de uniformes y equipamiento con control de inventario, tallas disponibles y proceso de compra integrado.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon" style="background: var(--color-info-light); color: var(--color-info);">💬</div>
+          <h3>Soporte omnicanal</h3>
+          <p>Atención por Web, WhatsApp, Instagram y Facebook. Un bot inteligente responde al instante y escala cuando es necesario.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== BENEFITS SECTION ===== -->
+    <section class="benefits" id="beneficios">
+      <div class="benefits-container">
+        <div class="text-center">
+          <div class="section-label" style="margin: 0 auto var(--space-4);">¿Por qué elegirnos?</div>
+          <h2 class="section-heading">La mejor experiencia para tu familia</h2>
+          <p class="section-desc" style="margin: var(--space-4) auto var(--space-10);">
+            Más que una academia, somos una comunidad comprometida con el desarrollo integral de cada jugador.
+          </p>
+        </div>
+        
+        <div class="benefits-grid">
+          <div class="benefit-card">
+            <div class="benefit-icon">🏆</div>
+            <h3>Entrenadores profesionales</h3>
+            <p>Staff técnico certificado con experiencia en ligas profesionales y formación juvenil de élite.</p>
+          </div>
+          
+          <div class="benefit-card">
+            <div class="benefit-icon">🏟️</div>
+            <h3>Infraestructura de primer nivel</h3>
+            <p>Campos de juego en óptimas condiciones, material deportivo de calidad y espacios seguros.</p>
+          </div>
+          
+          <div class="benefit-card">
+            <div class="benefit-icon">📈</div>
+            <h3>Desarrollo integral</h3>
+            <p>Plan de formación que integra técnica, táctica, preparación física y valores deportivos.</p>
+          </div>
+          
+          <div class="benefit-card">
+            <div class="benefit-icon">🤝</div>
+            <h3>Comunicación constante</h3>
+            <p>Reportes de progreso, notificaciones de asistencia y canal directo con entrenadores.</p>
+          </div>
+          
+          <div class="benefit-card">
+            <div class="benefit-icon">💳</div>
+            <h3>Pagos flexibles</h3>
+            <p>Acepta pagos en USD y VES con tasa BCV del día. Transferencias, efectivo y pago móvil.</p>
+          </div>
+          
+          <div class="benefit-card">
+            <div class="benefit-icon">📱</div>
+            <h3>Tecnología moderna</h3>
+            <p>Plataforma PWA instalable, dashboard en tiempo real y atención automatizada con IA.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TESTIMONIALS ===== -->
+    <section class="testimonials" id="testimonios">
+      <div class="text-center">
+        <div class="section-label" style="margin: 0 auto var(--space-4);">Testimonios</div>
+        <h2 class="section-heading">Lo que dicen nuestras familias</h2>
+      </div>
+      
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testimonial-text">
+            "Mi hijo ha mejorado increíblemente desde que entró a Universitarios FC. Los entrenadores son excelentes y la comunicación con los representantes es constante."
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">MG</div>
+            <div>
+              <div class="testimonial-name">María González</div>
+              <div class="testimonial-role">Representante — Categoría U-12</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testimonial-text">
+            "El sistema de pagos es muy cómodo, puedo pagar en bolívares o dólares. Además el chatbot me ayuda a resolver dudas al instante sin tener que esperar."
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">CR</div>
+            <div>
+              <div class="testimonial-name">Carlos Rodríguez</div>
+              <div class="testimonial-role">Representante — Categoría U-16</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testimonial-text">
+            "Me encanta poder ver el progreso de asistencia de mi hija directamente. La plataforma digital que tienen es de primer mundo, muy profesional."
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">LP</div>
+            <div>
+              <div class="testimonial-name">Laura Pérez</div>
+              <div class="testimonial-role">Representante — Categoría Femenino</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CTA SECTION ===== -->
+    <section class="cta-section">
+      <div class="cta-content">
+        <h2>Tu consulta puede resolverse en menos de 2 minutos</h2>
+        <p>Escríbenos por el chat inteligente y obtén respuestas inmediatas. Si necesitas atención personalizada, nuestro equipo está listo para ayudarte.</p>
+        <button id="ctaOpenChat" class="btn btn-lg">💬 Iniciar conversación</button>
+      </div>
+    </section>
+
+    <!-- ===== CONTACT SECTION ===== -->
+    <section class="contact" id="contacto">
+      <div class="text-center">
+        <div class="section-label" style="margin: 0 auto var(--space-4);">Contáctanos</div>
+        <h2 class="section-heading">Estamos para ayudarte</h2>
+      </div>
+      
+      <div class="contact-grid">
+        <div class="contact-card">
+          <div class="contact-icon">📍</div>
+          <h3>Ubicación</h3>
+          <p>Mérida, Venezuela</p>
+          <p style="margin-top:4px; font-size: 0.8rem;">Campo principal de entrenamiento</p>
+        </div>
+        
+        <div class="contact-card">
+          <div class="contact-icon">📞</div>
+          <h3>Teléfono</h3>
+          <p>+58 424-764-0859</p>
+          <p style="margin-top:4px; font-size: 0.8rem;">WhatsApp disponible</p>
+        </div>
+        
+        <div class="contact-card">
+          <div class="contact-icon">🕐</div>
+          <h3>Horarios</h3>
+          <p>Lunes a Viernes: 8am - 6pm</p>
+          <p style="margin-top:4px; font-size: 0.8rem;">Sábados: 8am - 12pm</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="landing-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-brand-header">
+            <div class="footer-logo">⚽</div>
+            <strong>Universitarios FC</strong>
+          </div>
+          <p>Academia de fútbol profesional dedicada a la formación integral de jóvenes atletas desde 2018.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Instagram">📷</a>
+            <a href="#" aria-label="Facebook">👤</a>
+            <a href="#" aria-label="WhatsApp">💬</a>
+            <a href="#" aria-label="YouTube">🎬</a>
+          </div>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Academia</h4>
+          <ul class="footer-links">
+            <li><a href="#servicios">Servicios</a></li>
+            <li><a href="#beneficios">Beneficios</a></li>
+            <li><a href="#testimonios">Testimonios</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Categorías</h4>
+          <ul class="footer-links">
+            <li><a href="#">U-8 / U-10</a></li>
+            <li><a href="#">U-12 / U-14</a></li>
+            <li><a href="#">U-16 / U-18</a></li>
+            <li><a href="#">Adultos / Femenino</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Legal</h4>
+          <ul class="footer-links">
+            <li><a href="#">Términos de uso</a></li>
+            <li><a href="#">Política de privacidad</a></li>
+            <li><a href="#">Reglamento interno</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2026 Universitarios FC. Todos los derechos reservados.</p>
+        <p>Hecho con ❤️ en Mérida, Venezuela</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== CHAT WIDGET ===== -->
+  <button id="chatWidgetBubble" class="chat-widget-bubble" aria-label="Abrir chat de atención">
+    <span class="chat-widget-pulse"></span>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+    </svg>
+    <span class="chat-widget-label">Atención en línea</span>
+  </button>
+
+  <!-- ===== CHAT WINDOW ===== -->
+  <div id="chatWindow" class="chat-window" aria-label="Chat de atención" role="dialog">
+    <div class="chat-window-header">
+      <div class="chat-header-info">
+        <div class="chat-header-avatar">🤖</div>
+        <div class="chat-header-text">
+          <h4>Universitarios FC</h4>
+          <span><span class="online-dot"></span> UniBot · En línea</span>
+        </div>
+      </div>
+      <button id="chatCloseBtn" class="chat-close-btn" aria-label="Cerrar chat">✕</button>
+    </div>
+    
+    <!-- Session Menu Overlay -->
+    <div id="chatSessionMenu" class="chat-session-menu hidden" style="position: absolute; inset: 0; top: 60px; background: rgba(255,255,255,0.95); z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; backdrop-filter: blur(5px);">
+      <div style="font-size: 2rem; margin-bottom: 10px;">👋</div>
+      <h3 style="margin-bottom: 15px; color: var(--color-text);">¡Hola de nuevo!</h3>
+      <p style="margin-bottom: 20px; font-size: 0.9rem; color: var(--color-text-secondary);">Tienes una consulta previa activa. ¿Qué deseas hacer?</p>
+      <button id="btnContinueChat" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">Continuar consulta anterior</button>
+      <button id="btnNewChat" class="btn btn-outline" style="width: 100%;">Iniciar nueva consulta</button>
+    </div>
+
+    <div id="chatMessages" class="chat-window-messages" aria-live="polite"></div>
+    
+    <!-- Quick Reply Buttons -->
+    <div id="chatQuickReplies" class="chat-quick-replies hidden">
+      <button class="quick-reply-btn" data-msg="¿Cuáles son las categorías disponibles?">📋 Categorías</button>
+      <button class="quick-reply-btn" data-msg="¿Cuáles son los horarios de entrenamiento?">🕐 Horarios</button>
+      <button class="quick-reply-btn" data-msg="¿Cuánto cuestan las inscripciones?">💰 Precios</button>
+      <button class="quick-reply-btn" data-msg="¿Cuáles son los métodos de pago?">💳 Métodos de Pago</button>
+      <button class="quick-reply-btn" data-msg="¿Dónde están ubicados?">📍 Ubicación</button>
+      <button class="quick-reply-btn" data-msg="Quiero información sobre uniformes">👕 Uniformes</button>
+      <button class="quick-reply-btn" data-msg="¿Cómo puedo inscribir a mi hijo?">✍️ Inscripción</button>
+      <button class="quick-reply-btn" data-msg="Quiero hablar con un asesor humano">👤 Hablar con asesor</button>
+    </div>
+    
+    <div id="chatEscalationBanner" class="chat-escalation-banner hidden">
+      <span>💡 ¿Necesitas hablar con un asesor?</span>
+      <button id="chatEscalateBtn" class="btn btn-sm btn-outline">Solicitar asesor</button>
+    </div>
+    
+    <div style="display: flex; gap: 8px; align-items: center; padding: 10px 15px; border-top: 1px solid var(--color-border); background: var(--color-surface); z-index: 10; position: relative;">
+      <button type="button" id="toggleQuickRepliesBtn" class="btn-icon" aria-label="Opciones rápidas" style="flex-shrink: 0;">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+          <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+        </svg>
+      </button>
+      <form id="chatForm" class="chat-window-input" autocomplete="off" style="padding: 0; border: none; flex: 1; position: static;">
+        <input id="chatInput" type="text" maxlength="300" placeholder="Escribe tu consulta..." aria-label="Mensaje">
+        <button type="submit" class="send-btn" aria-label="Enviar mensaje">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Firebase SDK (compat mode for broad CDN usage) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <!-- App entry point -->
+  <script type="module" src="js/app/landing.js"></script>
+</body>
+</html>

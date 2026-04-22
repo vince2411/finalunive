@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universitarios FC | Panel de Administración</title>
+  <meta name="description" content="Panel administrativo integral para la academia de fútbol Universitarios FC. Gestión completa de jugadores, finanzas y comunicación.">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/icon-192.png" type="image/png">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/admin.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+  <!-- ==================== LOGIN SCREEN ==================== -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <span class="login-logo">⚽</span>
+      <h1>Universitarios FC</h1>
+      <p class="login-subtitle">Panel de Administración · Sistema Integral v2.0</p>
+      
+      <form id="loginForm" class="login-form" autocomplete="off">
+        <div class="form-group">
+          <label for="loginEmail">Correo electrónico</label>
+          <input id="loginEmail" type="email" class="form-input" placeholder="admin@universitariosfc.com" value="admin@universitariosfc.com" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Contraseña</label>
+          <input id="loginPassword" type="password" class="form-input" placeholder="Ingresa tu contraseña" required>
+        </div>
+        <button type="submit" id="loginBtn" class="btn btn-primary btn-lg w-full">
+          Iniciar sesión
+        </button>
+        <p id="loginError" class="login-error"></p>
+      </form>
+      
+      <div id="loginLoader" class="login-loader">
+        <div class="spinner"></div>
+      </div>
+      
+      <div class="login-footer">
+        <a href="#">¿Olvidaste tu contraseña?</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DASHBOARD ==================== -->
+  <div id="dashboardShell" class="dashboard-shell hidden">
+    
+    <!-- Sidebar Overlay (mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+    
+    <!-- ===== SIDEBAR ===== -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">⚽</div>
+        <div class="sidebar-brand-text">
+          <strong>Universitarios FC</strong>
+          <small>Admin Suite v2.0</small>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav" aria-label="Navegación del dashboard">
+        <div class="sidebar-nav-label">Principal</div>
+        <button class="nav-item active" data-section="section-dashboard">
+          <span class="nav-item-icon">📊</span>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-section="section-jugadores">
+          <span class="nav-item-icon">👥</span>
+          <span>Jugadores</span>
+        </button>
+        <button class="nav-item" data-section="section-categorias">
+          <span class="nav-item-icon">🏷️</span>
+          <span>Categorías</span>
+        </button>
+        <button class="nav-item" data-section="section-asistencia">
+          <span class="nav-item-icon">✅</span>
+          <span>Asistencia</span>
+        </button>
+        
+        <div class="sidebar-nav-label">Operaciones</div>
+        <button class="nav-item" data-section="section-inscripciones">
+          <span class="nav-item-icon">📋</span>
+          <span>Inscripciones</span>
+        </button>
+        <button class="nav-item" data-section="section-uniformes">
+          <span class="nav-item-icon">👕</span>
+          <span>Uniformes</span>
+        </button>
+        <button class="nav-item" data-section="section-facturacion">
+          <span class="nav-item-icon">🧾</span>
+          <span>Facturación</span>
+        </button>
+        
+        <div class="sidebar-nav-label">Análisis</div>
+        <button class="nav-item" data-section="section-reportes">
+          <span class="nav-item-icon">📈</span>
+          <span>Reportes</span>
+        </button>
+        <button class="nav-item" data-section="section-morosidad">
+          <span class="nav-item-icon">⚠️</span>
+          <span>Morosidad</span>
+        </button>
+        
+        <div class="sidebar-nav-label">Comunicación</div>
+        <button class="nav-item" data-section="section-omnicanal">
+          <span class="nav-item-icon">💬</span>
+          <span>Omnicanal</span>
+          <span id="omniBadge" class="nav-item-badge hidden">0</span>
+        </button>
+        
+        <div class="sidebar-nav-label">Sistema</div>
+        <button class="nav-item" data-section="section-herramientas">
+          <span class="nav-item-icon">🔧</span>
+          <span>Herramientas</span>
+        </button>
+        <button class="nav-item" data-section="section-configuracion">
+          <span class="nav-item-icon">⚙️</span>
+          <span>Configuración</span>
+        </button>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-user-avatar">A</div>
+          <div class="sidebar-user-info">
+            <div class="sidebar-user-name">Administrador</div>
+            <div class="sidebar-user-role">Admin Principal</div>
+          </div>
+        </div>
+        <button id="logoutBtn" class="btn btn-outline w-full mt-4" style="font-size: var(--text-sm);">
+          🚪 Cerrar sesión
+        </button>
+      </div>
+    </aside>
+
+    <!-- ===== TOPBAR ===== -->
+    <header class="topbar" id="topbar">
+      <div class="topbar-left">
+        <button id="sidebarToggle" class="topbar-toggle btn-icon" aria-label="Abrir menú">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </button>
+        <div class="topbar-breadcrumb">
+          <span id="breadcrumbSection">Dashboard</span>
+        </div>
+      </div>
+      
+      <div class="topbar-right">
+        <div id="topbarRate" class="rate-chip">BCV: --</div>
+        
+        <button id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙</button>
+        
+        <div style="position: relative;">
+          <button id="notificationBell" class="btn-icon btn-ghost notification-btn" aria-label="Notificaciones">
+            🔔
+            <span id="notifCount" class="notification-count" data-count="0">0</span>
+          </button>
+          <div id="notificationPanel" class="notification-panel">
+            <div class="notification-panel-header">
+              <h4>Notificaciones</h4>
+              <button id="markAllReadBtn" class="btn btn-sm btn-ghost">Marcar leídas</button>
+            </div>
+            <div id="notificationList" class="notification-list"></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content" id="mainContent">
+
+      <!-- ========== DASHBOARD HOME ========== -->
+      <section id="section-dashboard" class="content-section active">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Resumen Ejecutivo</h2>
+            <p class="section-subtitle">Vista general de operaciones del mes</p>
+          </div>
+        </div>
+        
+        <div class="metrics-grid" id="dashMetrics">
+          <div class="metric-card">
+            <div class="metric-icon" style="background: var(--color-success-light); color: var(--color-success);">💰</div>
+            <div class="metric-label">Total Ingresos Mes</div>
+            <div class="metric-value" id="metIncome">$0.00</div>
+            <div class="metric-sub" id="metIncomeVes">Bs 0.00</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon" style="background: var(--color-primary-light); color: var(--color-primary);">📋</div>
+            <div class="metric-label">Inscripciones Activas</div>
+            <div class="metric-value" id="metInscriptions">0</div>
+            <div class="metric-sub">jugadores inscritos</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon" style="background: var(--color-warning-light); color: var(--color-warning);">⚠️</div>
+            <div class="metric-label">Cuotas Pendientes</div>
+            <div class="metric-value" id="metPending">$0.00</div>
+            <div class="metric-sub" id="metPendingCount">0 deudores</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon" style="background: var(--color-info-light); color: var(--color-info);">✅</div>
+            <div class="metric-label">Asistencia Promedio</div>
+            <div class="metric-value" id="metAttendance">0%</div>
+            <div class="metric-trend up" id="metAttTrend">↑ estable</div>
+          </div>
+        </div>
+        
+        <div class="grid-2" style="margin-bottom: var(--space-6);">
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-title">Ingresos vs Período</h4>
+            </div>
+            <div class="chart-container">
+              <canvas id="chartIncome"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-title">Distribución por Categoría</h4>
+            </div>
+            <div class="chart-container">
+              <canvas id="chartCategories"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title">Actividad Reciente</h4>
+          </div>
+          <div id="activityFeed" class="activity-feed"></div>
+        </div>
+      </section>
+
+      <!-- ========== JUGADORES ========== -->
+      <section id="section-jugadores" class="content-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Gestión de Jugadores</h2>
+            <p class="section-subtitle">Administra jugadores por categoría</p>
+          </div>
+          <div class="section-actions">
+            <input type="text" id="playerSearch" class="form-input" placeholder="Buscar jugador..." style="width: 220px;">
+            <select id="playerCatFilter" class="form-select" style="width: 160px;">
+              <option value="">Todas las categorías</option>
+            </select>
+            <button id="addPlayerBtn" class="btn btn-primary">+ Nuevo Jugador</button>
+          </div>
+        </div>
+        
+        <div class="table-container">
+          <table class="data-table" id="playersTable">
+            <thead>
+              <tr>
+                <th>Jugador</th>
+                <th>Documento</th>
+                <th>Edad</th>
+                <th>Categoría</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="playersTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ========== CATEGORÍAS ========== -->
+      <section id="section-categorias" class="content-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Categorías de Jugadores</h2>
+            <p class="section-subtitle">Gestiona las categorías y sus configuraciones</p>
+          </div>
+          <div class="section-actions">
+            <button id="addCategoryBtn" class="btn btn-primary">+ Nueva Categoría</button>
+          </div>
+        </div>
+        
+        <div class="grid-3" id="categoriesGrid"></div>
+      </section>
+
+      <!-- ========== ASISTENCIA ========== -->
+      <section id="section-asistencia" class="content-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Panel de Asistencia</h2>
+            <p class="section-subtitle">Registro diario y seguimiento</p>
+          </div>
+        </div>
+        
+        <div class="attendance-controls">
+          <div class="form-group">
+            <label class="form-label">Fecha</label>
+            <input type="date" id="attendanceDate" class="form-input" style="width: 180px;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Categoría</label>
+            <select id="attendanceCategory" class="form-select" style="width: 180px;">
+              <option value="">Seleccionar categoría</option>
+            </select>
+          </div>
+          <button id="saveAttendanceBtn" class="btn btn-primary" style="align-self: flex-end;">
+            Guardar Asistencia
+          </button>
+        </div>
+        
+        <div class="grid-2" style="margin-bottom: var(--space-6);">
+          <div class="card">
+            <h4 class="card-title mb-4">Registro de Asistencia</h4>
+            <div id="attendanceList" class="attendance-list"></div>
+          </div>
+          <div class="card">
+            <h4 class="card-title mb-4">Estadísticas</h4>
+            <div class="attendance-stats" id="attendanceStats">
+              <div class="attendance-stat-card">
+                <div class="category-stat-value" id="attStatPresent">0</div>
+                <div class="category-stat-label">Presentes</div>
+              </div>
+              <div class="attendance-stat-card">
+                <div class="category-stat-value" id="attStatAbsent">0</div>
+                <div class="category-stat-label">Ausentes</div>
+              </div>
+              <div class="attendance-stat-card">
+                <div class="category-stat-value" id="attStatPercent">0%</div>
+                <div class="category-stat-label">Asistencia</div>
+              </div>
+            </div>
+            <div class="chart-container mt-6" style="height: 200px;">
+              <canvas id="chartAttendance"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== INSCRIPCIONES ========== -->
+      <section id="section-inscripciones" class="content-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Gestión de Inscripciones</h2>
+            <p class="section-subtitle">Control de inscripciones y pagos</p>
+          </div>
+          <div class="section-actions">
+            <button id="addInscriptionBtn" class="btn btn-primary">+ Nueva Inscripción</button>
+          </div>
+        </div>
+        
+        <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: var(--space-6);">
+          <div class="metric-card">
+            <div class="metric-label">Total inscripciones</div>
+            <div class="metric-value" id="insTotal">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Pagadas</div>
+            <div class="metric-value text-success" id="insPaid">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Pendientes</div>
+            <div class="metric-value text-warning" id="insPending">0</div>
+          </div>
+        </div>
+        
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Jugador</th>
+                <th>Categoría</th>
+                <th>Fecha</th>
+                <th>Monto USD</th>
+                <th>Monto VES</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="inscriptionsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ========== UNIFORMES ========== -->
+      <section id="section-uniformes" class="content-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Ventas de Uniformes</h2>
+            <p class="section-subtitle">Inventario y registro de ventas</p>
+          </div>
+          <div class="section-actions">
+            <button id="addUniformSaleBtn" class="btn btn-primary">+ Registrar Venta</button>
+          </div>
+        </div>
+        
+        <div class="grid-4" id="uniformsGrid" style="margin-bottom: var(--space-6);"></div>
+        
+        <div class="card">
+          <h4 class="card-title mb-4">Historial de Ventas</h4>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Producto</th>
+                  <th>Talla</th>
+                  <th>Cant.</th>
+                  <th>USD</th>
+                  <th>VES</th>
+                  <th>Comprador</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="uniformSalesBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== FACTURACIÓN ========== -->
+      <section id="section-facturacion" class="content-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Facturación Profesional</h2>
+            <p class="section-subtitle">Genera y gestiona facturas</p>
+          </div>
+          <div class="section-actions">
+            <button id="newInvoiceBtn" class="btn btn-primary">+ Nueva Factura</button>
+          </div>
+        </div>
+        
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>N° Factura</th>
+                <th>Cliente</th>
+                <th>Concepto</th>
+                <th>USD</th>
+                <th>VES</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="invoicesBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ========== REPORTES ========== -->
+      <section id="section-reportes" class="content-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Reportes Analíticos</h2>
+            <p class="section-subtitle">Análisis detallado en tiempo real</p>
+          </div>
+          <div class="section-actions">
+            <button id="exportReportBtn" class="btn btn-outline">📄 Exportar PDF</button>
+            <button id="exportCsvBtn" class="btn btn-outline">📊 Exportar CSV</button>
+          </div>
+        </div>
+        
+        <div class="report-tabs" id="reportTabs">
+          <button class="report-tab active" data-report="financiero">💰 Financiero</button>
+          <button class="report-tab" data-report="inscripciones">📋 Inscripciones</button>
+          <button class="report-tab" data-report="asistencia">✅ Asistencia</button>
+          <button class="report-tab" data-report="morosidad">⚠️ Morosidad</button>
+        </div>
+        
+        <div class="report-filters">
+          <div class="form-group">
+            <label class="form-label">Período</label>
+            <select id="reportPeriod" class="form-select" style="width: 160px;">
+              <option value="month">Este mes</option>
+              <option value="quarter">Trimestre</option>
+              <option value="year">Este año</option>
+              <option value="custom">Personalizado</option>
+            </select>
+          </div>
+          <div class="form-group" id="reportDateRange" style="display:none;">
+            <label class="form-label">Rango</label>
+            <div class="form-inline">
+              <input type="date" id="reportFrom" class="form-input" style="width: 160px;">
+              <input type="date" id="reportTo" class="form-input" style="width: 160px;">
+            </div>
+          </div>
+          <button id="refreshReportBtn" class="btn btn-outline" style="align-self: flex-end;">🔄 Actualizar</button>
+        </div>
+        
+        <!-- Dynamic Summary Metrics -->
+        <div id="reportSummary" style="margin-bottom: var(--space-6);"></div>
+        
+        <div id="reportContent">
+          <div class="grid-2" style="margin-bottom: var(--space-6);">
+            <div class="card">
+              <h4 id="reportChart1Title" class="card-title mb-4">📊 Ingresos Mensuales (USD)</h4>
+              <div class="chart-container">
+                <canvas id="reportChart1"></canvas>
+              </div>
+            </div>
+            <div class="card">
+              <h4 id="reportChart2Title" class="card-title mb-4">📋 Distribución por Concepto</h4>
+              <div class="chart-container">
+                <canvas id="reportChart2"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== MOROSIDAD ========== -->
+      <section id="section-morosidad" class="content-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Morosidad y Cobranza</h2>
+            <p class="section-subtitle">Gestión inteligente de deudas</p>
+          </div>
+          <div class="section-actions">
+            <button id="addDebtBtn" class="btn btn-primary">+ Registrar Deuda</button>
+          </div>
+        </div>
+        
+        <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: var(--space-6);">
+          <div class="metric-card">
+            <div class="metric-label">Deuda total activa</div>
+            <div class="metric-value text-error" id="debtTotalUsd">$0.00</div>
+            <div class="metric-sub" id="debtTotalVes">Bs 0.00</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Deudores activos</div>
+            <div class="metric-value" id="debtCount">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Recuperado este mes</div>
+            <div class="metric-value text-success" id="debtRecovered">$0.00</div>
+          </div>
+        </div>
+        
+        <div class="card" style="margin-bottom: var(--space-6);">
+          <h4 class="card-title mb-4">Morosos Activos</h4>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Representante</th>
+                  <th>Concepto</th>
+                  <th>Deuda USD</th>
+                  <th>Deuda VES</th>
+                  <th>Días retraso</th>
+                  <th>Urgencia</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="debtorsBody"></tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h4 class="card-title mb-4">Historial de Pagos Liquidados</h4>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Representante</th>
+                  <th>Concepto</th>
+                  <th>Monto</th>
+                  <th>Fecha pago</th>
+                  <th>Método</th>
+                </tr>
+              </thead>
+              <tbody id="paymentHistoryBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== OMNICANAL ========== -->
+      <section id="section-omnicanal" class="content-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Bandeja Omnicanal</h2>
+            <p class="section-subtitle">Conversaciones de todos los canales</p>
+          </div>
+          <div class="section-actions">
+            <select id="omniChannelFilter" class="form-select" style="width: 140px;">
+              <option value="all">Todos</option>
+              <option value="web">🌐 Web</option>
+              <option value="whatsapp">💬 WhatsApp</option>
+              <option value="instagram">📸 Instagram</option>
+              <option value="facebook">👤 Facebook</option>
+            </select>
+            <select id="omniStatusFilter" class="form-select" style="width: 140px;">
+              <option value="all">Todos los estados</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="atendido_ia">Atendido IA</option>
+              <option value="escalado_humano">Escalado</option>
+              <option value="cerrado">Cerrado</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="omnichannel-layout">
+          <!-- Conversation List -->
+          <div class="conversation-list">
+            <div class="conversation-list-header">
+              <h4>Conversaciones</h4>
+              <div class="channel-filters">
+                <button class="channel-filter active" data-channel="all">Todos</button>
+                <button class="channel-filter" data-channel="web">🌐</button>
+                <button class="channel-filter" data-channel="whatsapp">💬</button>
+                <button class="channel-filter" data-channel="instagram">📸</button>
+                <button class="channel-filter" data-channel="facebook">👤</button>
+              </div>
+            </div>
+            <div id="conversationsList" class="conversations-scroll"></div>
+          </div>
+          
+          <!-- Chat Panel -->
+          <div class="chat-panel">
+            <div class="chat-panel-header" id="chatPanelHeader">
+              <div class="chat-panel-user">
+                <div class="conversation-avatar web" id="chatPanelAvatar">🌐</div>
+                <div>
+                  <div class="chat-panel-user-name" id="chatPanelName">Selecciona una conversación</div>
+                  <div class="chat-panel-user-status" id="chatPanelStatus">—</div>
+                </div>
+              </div>
+              <div class="section-actions">
+                <button id="takeControlBtn" class="btn btn-sm btn-outline hidden">🎯 Tomar control</button>
+                <button id="closeConvBtn" class="btn btn-sm btn-outline hidden">✕ Cerrar</button>
+              </div>
+            </div>
+            
+            <div id="chatThread" class="chat-messages">
+              <div class="empty-state">
+                <div class="empty-state-icon">💬</div>
+                <div class="empty-state-title">Selecciona una conversación</div>
+                <div class="empty-state-text">Haz clic en una conversación de la lista para ver los mensajes</div>
+              </div>
+            </div>
+            
+            <form id="advisorChatForm" class="chat-input-area">
+              <input id="advisorChatInput" type="text" maxlength="500" placeholder="Escribe respuesta como asesor..." disabled>
+              <button type="submit" class="chat-send-btn" disabled>
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== HERRAMIENTAS ========== -->
+      <section id="section-herramientas" class="content-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Herramientas Financieras</h2>
+            <p class="section-subtitle">Calculadora y conversor bimonetario</p>
+          </div>
+        </div>
+        
+        <div class="grid-2">
+          <!-- Calculator -->
+          <div class="card">
+            <h4 class="card-title mb-4">Calculadora</h4>
+            <div class="calculator" style="margin: 0 auto;">
+              <div class="calc-history" id="calcHistory"></div>
+              <input id="calcDisplay" class="calc-display" type="text" value="0" readonly>
+              <div class="calc-grid" id="calcGrid">
+                <button class="calc-btn clear" data-action="clear">C</button>
+                <button class="calc-btn" data-action="backspace">⌫</button>
+                <button class="calc-btn op" data-val="%">%</button>
+                <button class="calc-btn op" data-val="/">÷</button>
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn op" data-val="*">×</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn op" data-val="-">−</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn op" data-val="+">+</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn equals" data-action="equals">=</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Converter -->
+          <div class="card">
+            <h4 class="card-title mb-4">Conversor USD ⇄ VES</h4>
+            <div class="converter-card">
+              <div class="converter-fields">
+                <div class="form-group">
+                  <label class="form-label">Monto en USD ($)</label>
+                  <input type="number" id="converterUsd" class="form-input" min="0" step="0.01" placeholder="0.00">
+                </div>
+                
+                <button type="button" id="converterSwap" class="converter-swap" aria-label="Invertir conversión">⇅</button>
+                
+                <div class="form-group">
+                  <label class="form-label">Monto en VES (Bs)</label>
+                  <input type="number" id="converterVes" class="form-input" min="0" step="0.01" placeholder="0.00">
+                </div>
+              </div>
+              
+              <div class="converter-rate">
+                <div class="converter-rate-value" id="convRateValue">--</div>
+                <div class="converter-rate-label" id="convRateLabel">Cargando tasa BCV...</div>
+              </div>
+              
+              <div class="flex justify-between mt-4">
+                <button id="convRefreshBtn" class="btn btn-sm btn-outline">🔄 Actualizar tasa</button>
+                <button id="convCopyBtn" class="btn btn-sm btn-ghost">📋 Copiar resultado</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== CONFIGURACIÓN ========== -->
+      <section id="section-configuracion" class="content-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Configuración</h2>
+            <p class="section-subtitle">Ajustes del sistema</p>
+          </div>
+        </div>
+        
+        <div class="config-tabs" id="configTabs">
+          <button class="config-tab active" data-config="general">General</button>
+          <button class="config-tab" data-config="banking">Datos bancarios</button>
+          <button class="config-tab" data-config="invoicing">Facturación</button>
+          <button class="config-tab" data-config="bcv">Tasa BCV</button>
+          <button class="config-tab" data-config="notifications">Notificaciones</button>
+          <button class="config-tab" data-config="channels">Canales</button>
+          <button class="config-tab" data-config="export">Exportar</button>
+          <button class="config-tab" data-config="danger">Zona peligrosa</button>
+        </div>
+        
+        <!-- General -->
+        <div id="config-general" class="config-section active">
+          <div class="card">
+            <form id="configGeneralForm" class="form-group" style="max-width: 600px; display: flex; flex-direction: column; gap: var(--space-4);">
+              <div class="form-group">
+                <label class="form-label">Nombre de la academia</label>
+                <input type="text" class="form-input" value="Universitarios FC" name="academyName">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Descripción corta</label>
+                <input type="text" class="form-input" value="Academia de fútbol profesional" name="description">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Teléfono principal</label>
+                <input type="text" class="form-input" value="+58 424-764-0859" name="phone">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email principal</label>
+                <input type="email" class="form-input" value="admin@universitariosfc.com" name="email">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Dirección</label>
+                <input type="text" class="form-input" value="Mérida, Venezuela" name="address">
+              </div>
+              <button type="submit" class="btn btn-primary" style="align-self: flex-start;">Guardar cambios</button>
+            </form>
+          </div>
+        </div>
+        
+        <!-- Banking -->
+        <div id="config-banking" class="config-section">
+          <div class="card">
+            <form id="configBankForm" class="form-group" style="max-width: 600px; display: flex; flex-direction: column; gap: var(--space-4);">
+              <div class="form-group">
+                <label class="form-label">Banco</label>
+                <input type="text" class="form-input" value="Banco de Venezuela" name="bankName">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Titular de la cuenta</label>
+                <input type="text" class="form-input" value="Universitarios FC" name="accountHolder">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cédula / RIF</label>
+                <input type="text" class="form-input" value="32307521" name="bankId">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Teléfono (pago móvil)</label>
+                <input type="text" class="form-input" value="04247640859" name="bankPhone">
+              </div>
+              <p class="text-muted" style="font-size: var(--text-xs);">Estos datos se usan en mensajes de cobranza por WhatsApp y facturas PDF.</p>
+              <button type="submit" class="btn btn-primary" style="align-self: flex-start;">Guardar datos bancarios</button>
+            </form>
+          </div>
+        </div>
+        
+        <!-- Invoicing Config -->
+        <div id="config-invoicing" class="config-section">
+          <div class="card">
+            <form id="configInvoiceForm" class="form-group" style="max-width: 600px; display: flex; flex-direction: column; gap: var(--space-4);">
+              <div class="form-group">
+                <label class="form-label">RIF de la empresa</label>
+                <input type="text" class="form-input" value="J-00000000-0" name="rif">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Razón social</label>
+                <input type="text" class="form-input" value="Universitarios FC C.A." name="legalName">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Número de factura inicial</label>
+                <input type="number" class="form-input" value="1001" name="invoiceStart">
+              </div>
+              <button type="submit" class="btn btn-primary" style="align-self: flex-start;">Guardar configuración</button>
+            </form>
+          </div>
+        </div>
+        
+        <!-- BCV Rate -->
+        <div id="config-bcv" class="config-section">
+          <div class="card">
+            <div style="max-width: 600px;">
+              <h4 class="card-title mb-4">Tasa BCV (Fallback Manual)</h4>
+              <div class="converter-rate mb-6" style="background: var(--color-surface-muted);">
+                <div class="converter-rate-value" id="configBcvCurrent">--</div>
+                <div class="converter-rate-label" id="configBcvStatus">Cargando...</div>
+              </div>
+              <div class="form-group mb-4">
+                <label class="form-label">Tasa manual (USD a Bs)</label>
+                <div class="form-inline">
+                  <input type="number" id="manualRateInput" class="form-input" min="0" step="0.01" placeholder="Ej: 85.50">
+                  <button id="setManualRateBtn" class="btn btn-primary">Aplicar</button>
+                </div>
+              </div>
+              <button id="useApiRateBtn" class="btn btn-outline">🔄 Usar tasa actual de API</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Notifications Config -->
+        <div id="config-notifications" class="config-section">
+          <div class="card">
+            <h4 class="card-title mb-4">Notificaciones del Sistema</h4>
+            <div style="max-width: 500px; display: flex; flex-direction: column; gap: var(--space-3);">
+              <div class="config-row">
+                <div>
+                  <div class="config-row-label">Habilitar notificaciones</div>
+                  <div class="config-row-desc">Recibe alertas del sistema</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="toggleNotifs" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="config-row">
+                <div>
+                  <div class="config-row-label">Alerta de cobranza (3 días)</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="config-row">
+                <div>
+                  <div class="config-row-label">Alerta de escalamiento</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="config-row">
+                <div>
+                  <div class="config-row-label">Nuevas inscripciones</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="config-row">
+                <div>
+                  <div class="config-row-label">Pagos recibidos</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="config-row">
+                <div>
+                  <div class="config-row-label">Sonido de notificación</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Channels Config -->
+        <div id="config-channels" class="config-section">
+          <div class="card">
+            <h4 class="card-title mb-4">Integración de Canales</h4>
+            <div class="grid-2" style="max-width: 800px;">
+              <div class="category-card">
+                <div class="category-card-header">
+                  <span class="category-name">💬 WhatsApp</span>
+                  <span class="badge badge-warning">Pendiente</span>
+                </div>
+                <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3);">
+                  Requiere WhatsApp Business API
+                </p>
+                <button class="btn btn-sm btn-outline w-full">Configurar</button>
+              </div>
+              <div class="category-card">
+                <div class="category-card-header">
+                  <span class="category-name">📸 Instagram</span>
+                  <span class="badge badge-warning">Pendiente</span>
+                </div>
+                <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3);">
+                  Requiere Instagram Messaging API
+                </p>
+                <button class="btn btn-sm btn-outline w-full">Configurar</button>
+              </div>
+              <div class="category-card">
+                <div class="category-card-header">
+                  <span class="category-name">👤 Facebook</span>
+                  <span class="badge badge-warning">Pendiente</span>
+                </div>
+                <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3);">
+                  Requiere Facebook Messenger API
+                </p>
+                <button class="btn btn-sm btn-outline w-full">Configurar</button>
+              </div>
+              <div class="category-card">
+                <div class="category-card-header">
+                  <span class="category-name">🌐 Web Chat</span>
+                  <span class="badge badge-success">Activo</span>
+                </div>
+                <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3);">
+                  Chat con UniBot + Groq AI
+                </p>
+                <button class="btn btn-sm btn-success w-full" disabled>Conectado</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Export -->
+        <div id="config-export" class="config-section">
+          <div class="card">
+            <h4 class="card-title mb-4">Exportar Datos (Backup)</h4>
+            <div style="display: flex; flex-direction: column; gap: var(--space-3); max-width: 400px;">
+              <button id="backupDataBtn" class="btn btn-outline">📥 Descargar backup de datos</button>
+              <button id="backupInvoicesBtn" class="btn btn-outline">🧾 Descargar facturas</button>
+              <button id="backupReportsBtn" class="btn btn-outline">📊 Descargar reportes</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Danger Zone -->
+        <div id="config-danger" class="config-section">
+          <div class="danger-zone">
+            <h4>⚠️ Zona Peligrosa</h4>
+            <p class="text-muted mb-6" style="font-size: var(--text-sm);">Estas acciones son irreversibles. Procede con precaución.</p>
+            <div style="display: flex; flex-direction: column; gap: var(--space-3); max-width: 400px;">
+              <button id="clearInvoicesBtn" class="btn btn-outline" style="border-color: var(--color-error); color: var(--color-error);">Borrar todas las facturas</button>
+              <button id="clearAttendanceBtn" class="btn btn-outline" style="border-color: var(--color-error); color: var(--color-error);">Borrar registros de asistencia</button>
+              <button id="resetPasswordBtn" class="btn btn-outline" style="border-color: var(--color-error); color: var(--color-error);">Resetear contraseña</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+  
+  <!-- Player Modal -->
+  <div id="playerModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="playerModalTitle">Nuevo Jugador</h3>
+        <button class="btn-icon btn-ghost" data-modal-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="playerForm" style="display: flex; flex-direction: column; gap: var(--space-4);">
+          <div class="form-group">
+            <label class="form-label">Nombre completo *</label>
+            <input type="text" name="name" class="form-input" required placeholder="Nombre y apellido">
+          </div>
+          <div class="form-inline">
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Documento de identidad</label>
+              <input type="text" name="cedula" class="form-input" placeholder="V-12345678">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Fecha de nacimiento *</label>
+              <input type="date" name="birthdate" class="form-input" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Categoría *</label>
+            <select name="category" class="form-select" required>
+              <option value="">Seleccionar categoría</option>
+            </select>
+          </div>
+          <div class="form-inline">
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Teléfono de emergencia</label>
+              <input type="tel" name="phone" class="form-input" placeholder="+58 424-000-0000">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Email representante</label>
+              <input type="email" name="email" class="form-input" placeholder="correo@ejemplo.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dirección</label>
+            <input type="text" name="address" class="form-input" placeholder="Dirección del jugador">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Estado</label>
+            <select name="status" class="form-select">
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+          <input type="hidden" name="id" value="">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-icon btn-ghost" data-modal-close>✕</button>
+        <button id="savePlayerBtn" class="btn btn-primary">Guardar Jugador</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Modal -->
+  <div id="categoryModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="categoryModalTitle">Nueva Categoría</h3>
+        <button class="btn-icon btn-ghost" data-modal-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="categoryForm" style="display: flex; flex-direction: column; gap: var(--space-4);">
+          <div class="form-group">
+            <label class="form-label">Nombre de la categoría *</label>
+            <input type="text" name="name" class="form-input" required placeholder="Ej: U-12">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Descripción</label>
+            <input type="text" name="description" class="form-input" placeholder="Categoría para jugadores de 11-12 años">
+          </div>
+          <div class="form-inline">
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Edad mínima</label>
+              <input type="number" name="ageMin" class="form-input" min="4" max="60" placeholder="8">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Edad máxima</label>
+              <input type="number" name="ageMax" class="form-input" min="4" max="60" placeholder="10">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Entrenador principal</label>
+            <input type="text" name="coach" class="form-input" placeholder="Nombre del entrenador">
+          </div>
+          <div class="form-inline">
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Cuota mensual (USD)</label>
+              <input type="number" name="feeUsd" class="form-input" min="0" step="0.01" placeholder="25.00">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Máximo jugadores</label>
+              <input type="number" name="maxPlayers" class="form-input" min="1" placeholder="25">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Horario</label>
+            <input type="text" name="schedule" class="form-input" placeholder="Lun-Mié-Vie 3:00pm - 5:00pm">
+          </div>
+          <input type="hidden" name="id" value="">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-icon btn-ghost" data-modal-close>✕</button>
+        <button id="saveCategoryBtn" class="btn btn-primary">Guardar Categoría</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inscription Modal -->
+  <div id="inscriptionModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Nueva Inscripción</h3>
+        <button class="btn-icon btn-ghost" data-modal-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="inscriptionForm" style="display: flex; flex-direction: column; gap: var(--space-4);">
+          <div class="form-group">
+            <label class="form-label">Jugador *</label>
+            <select name="playerId" class="form-select" required>
+              <option value="">Seleccionar jugador</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Categoría *</label>
+            <select name="category" class="form-select" required>
+              <option value="">Seleccionar categoría</option>
+            </select>
+          </div>
+          <div class="form-inline">
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Monto USD *</label>
+              <input type="number" name="amountUsd" class="form-input" min="0" step="0.01" required placeholder="0.00">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Monto VES</label>
+              <input type="number" name="amountVes" class="form-input" min="0" step="0.01" readonly placeholder="Auto-calculado">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Método de pago</label>
+            <select name="paymentMethod" class="form-select">
+              <option value="transferencia">Transferencia</option>
+              <option value="efectivo">Efectivo</option>
+              <option value="pago_movil">Pago Móvil</option>
+              <option value="tarjeta">Tarjeta</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Estado</label>
+            <select name="status" class="form-select">
+              <option value="pagada">Pagada</option>
+              <option value="pendiente">Pendiente</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-modal-close>Cancelar</button>
+        <button id="saveInscriptionBtn" class="btn btn-primary">Registrar Inscripción</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Debt Modal -->
+  <div id="debtModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Registrar Deuda</h3>
+        <button class="btn-icon btn-ghost" data-modal-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="debtForm" style="display: flex; flex-direction: column; gap: var(--space-4);">
+          <div class="form-group">
+            <label class="form-label">Nombre del representante *</label>
+            <input type="text" name="name" class="form-input" required placeholder="Nombre completo">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Concepto *</label>
+            <select name="concept" class="form-select" required>
+              <option value="inscripcion">Inscripción</option>
+              <option value="uniforme">Uniforme</option>
+              <option value="mensualidad">Mensualidad</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-inline">
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Monto USD *</label>
+              <input type="number" name="amountUsd" class="form-input" min="0" step="0.01" required placeholder="0.00">
+            </div>
+          </div>
+          <div class="form-inline">
+            <div class="form-group" style="width: 120px;">
+              <label class="form-label">Prefijo</label>
+              <select name="phonePrefix" class="form-select">
+                <option value="+58">+58 VE</option>
+                <option value="+57">+57 CO</option>
+                <option value="+1">+1 US</option>
+                <option value="+51">+51 PE</option>
+                <option value="+54">+54 AR</option>
+                <option value="+55">+55 BR</option>
+                <option value="+34">+34 ES</option>
+                <option value="+33">+33 FR</option>
+                <option value="+44">+44 UK</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Teléfono *</label>
+              <input type="text" name="phone" class="form-input" required placeholder="4247640859">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fecha de vencimiento</label>
+            <input type="date" name="dueDate" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Observaciones</label>
+            <textarea name="notes" class="form-textarea" placeholder="Notas adicionales..." rows="2"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-modal-close>Cancelar</button>
+        <button id="saveDebtBtn" class="btn btn-primary">Guardar Deuda</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invoice Modal -->
+  <div id="invoiceModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3>Nueva Factura</h3>
+        <button class="btn-icon btn-ghost" data-modal-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="invoiceForm" style="display: flex; flex-direction: column; gap: var(--space-4);">
+          <div class="form-inline">
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Cliente *</label>
+              <input type="text" name="clientName" class="form-input" required placeholder="Nombre del cliente">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Concepto *</label>
+              <select name="concept" class="form-select" required>
+                <option value="inscripcion">Inscripción</option>
+                <option value="uniformes">Uniformes</option>
+                <option value="mensualidad">Mensualidad</option>
+                <option value="servicios">Servicios</option>
+                <option value="otro">Otro</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Descripción</label>
+            <textarea name="description" class="form-textarea" rows="2" placeholder="Detalle de la factura..."></textarea>
+          </div>
+          <div class="form-inline">
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Cantidad</label>
+              <input type="number" name="quantity" class="form-input" min="1" value="1">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Precio unitario USD *</label>
+              <input type="number" name="unitPrice" class="form-input" min="0" step="0.01" required placeholder="0.00">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Total USD</label>
+              <input type="number" name="totalUsd" class="form-input" readonly placeholder="Auto">
+            </div>
+          </div>
+          <div class="form-inline">
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Fecha emisión</label>
+              <input type="date" name="issueDate" class="form-input">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Fecha vencimiento</label>
+              <input type="date" name="dueDate" class="form-input">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notas adicionales</label>
+            <textarea name="notes" class="form-textarea" rows="2" placeholder="Condiciones de pago, notas..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-modal-close>Cancelar</button>
+        <button id="saveInvoiceDraftBtn" class="btn btn-outline">💾 Guardar borrador</button>
+        <button id="generatePdfBtn" class="btn btn-primary">📄 Generar PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Uniform Sale Modal -->
+  <div id="uniformModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Registrar Venta de Uniforme</h3>
+        <button class="btn-icon btn-ghost" data-modal-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="uniformForm" style="display: flex; flex-direction: column; gap: var(--space-4);">
+          <div class="form-group">
+            <label class="form-label">Producto *</label>
+            <select name="product" class="form-select" required>
+              <option value="camiseta_entrenamiento">Camiseta de Entrenamiento</option>
+              <option value="camiseta_oficial">Camiseta Oficial</option>
+              <option value="short">Short</option>
+              <option value="medias">Medias</option>
+              <option value="conjunto_completo">Conjunto Completo</option>
+              <option value="chaqueta">Chaqueta</option>
+              <option value="morral">Morral</option>
+            </select>
+          </div>
+          <div class="form-inline">
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Talla</label>
+              <select name="size" class="form-select">
+                <option value="XS">XS</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Cantidad</label>
+              <input type="number" name="quantity" class="form-input" min="1" value="1">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Precio USD</label>
+              <input type="number" name="priceUsd" class="form-input" min="0" step="0.01" placeholder="0.00" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Comprador</label>
+            <input type="text" name="buyer" class="form-input" placeholder="Nombre del comprador">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-modal-close>Cancelar</button>
+        <button id="saveUniformSaleBtn" class="btn btn-primary">Confirmar Venta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
+  <!-- App entry point -->
+  <script type="module" src="js/app/admin.js"></script>
+</body>
+</html>

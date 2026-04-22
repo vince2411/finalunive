@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper: check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper: check if user is admin
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == 'admin@universitariosfc.com';
+    }
+    
+    // Jugadores collection
+    match /jugadores/{playerId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Categorías collection
+    match /categorias/{categoryId} {
+      allow read: if true; // Public read for landing page
+      allow write: if isAdmin();
+    }
+    
+    // Inscripciones collection
+    match /inscripciones/{inscriptionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Asistencia collection
+    match /asistencia/{attendanceId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Uniformes collection
+    match /uniformes/{uniformId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Facturas collection
+    match /facturas/{invoiceId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Morosos collection
+    match /morosos/{debtorId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Historial de pagos
+    match /historial_pagos/{paymentId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Conversaciones — readable/writable for chat widget
+    match /conversaciones/{convId} {
+      allow read, write: if true; // Public for chat widget
+    }
+    
+    // Reportes cache
+    match /reportes_cache/{reportId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Notificaciones
+    match /notificaciones/{notifId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    // Configuración
+    match /configuracion/{configId} {
+      allow read: if true; // BCV rate is public
+      allow write: if isAdmin();
+    }
+  }
+}

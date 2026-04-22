@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="192" height="192" rx="40" fill="url(#bg)"/>
+  <!-- Shield shape -->
+  <path d="M96 28 L148 52 L148 108 C148 140 124 162 96 172 C68 162 44 140 44 108 L44 52 Z" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <!-- Soccer ball circle -->
+  <circle cx="96" cy="90" r="32" fill="none" stroke="white" stroke-width="2.5" opacity="0.9"/>
+  <!-- Pentagon inside ball -->
+  <polygon points="96,62 112,73 108,92 84,92 80,73" fill="white" opacity="0.25"/>
+  <!-- Text -->
+  <text x="96" y="150" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800" fill="white" text-anchor="middle" letter-spacing="2">UFC</text>
+  <!-- Subtle star -->
+  <circle cx="96" cy="44" r="4" fill="url(#accent)"/>
+</svg>

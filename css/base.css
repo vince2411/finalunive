@@ -1,0 +1,255 @@
+:root {
+  color-scheme: light;
+  --font-heading: "Sora", "Trebuchet MS", sans-serif;
+  --font-body: "Manrope", "Segoe UI", sans-serif;
+
+  --bg: #f2f5f7;
+  --surface: #ffffff;
+  --surface-muted: #e8eef2;
+  --surface-strong: #d7e2ea;
+  --text: #112030;
+  --text-muted: #536373;
+  --primary: #0f7a66;
+  --primary-strong: #0a5b4d;
+  --primary-soft: #d7efe8;
+  --accent: #f0b143;
+  --danger: #d85a52;
+  --success: #319467;
+  --shadow-soft: 0 20px 45px rgba(17, 32, 48, 0.08);
+  --shadow-card: 0 12px 30px rgba(17, 32, 48, 0.09);
+  --border: 1px solid rgba(17, 32, 48, 0.12);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d1720;
+  --surface: #122431;
+  --surface-muted: #1b3244;
+  --surface-strong: #28485f;
+  --text: #ecf4f8;
+  --text-muted: #9db5c4;
+  --primary: #2dc29d;
+  --primary-strong: #1e997c;
+  --primary-soft: #19493d;
+  --accent: #ffcc66;
+  --danger: #ff746e;
+  --success: #4ed89c;
+  --shadow-soft: 0 20px 45px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.3);
+  --border: 1px solid rgba(236, 244, 248, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin: 0;
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+}
+
+p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.85rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(15, 122, 102, 0.18);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  padding: 0.76rem 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transition: transform 0.2s ease, box-shadow 0.25s ease, background 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: linear-gradient(130deg, var(--primary), #1f9e83);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(15, 122, 102, 0.25);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 14px 28px rgba(15, 122, 102, 0.35);
+}
+
+.btn-outline {
+  border: var(--border);
+  background: var(--surface);
+}
+
+.btn-ghost {
+  background: var(--surface-muted);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.24rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.badge.success {
+  background: rgba(49, 148, 103, 0.18);
+  color: var(--success);
+}
+
+.badge.warning {
+  background: rgba(240, 177, 67, 0.2);
+  color: #8d5f0a;
+}
+
+.badge.danger {
+  background: rgba(216, 90, 82, 0.18);
+  color: var(--danger);
+}
+
+.badge.info {
+  background: rgba(15, 122, 102, 0.18);
+  color: var(--primary);
+}
+
+.table-wrap {
+  overflow: auto;
+  border-radius: var(--radius-md);
+  border: var(--border);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 620px;
+  background: var(--surface);
+}
+
+thead {
+  background: var(--surface-muted);
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.8rem 0.85rem;
+  border-bottom: 1px solid rgba(17, 32, 48, 0.08);
+  font-size: 0.92rem;
+}
+
+tbody tr:hover {
+  background: rgba(15, 122, 102, 0.05);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.status-pill.pendiente {
+  background: rgba(240, 177, 67, 0.22);
+  color: #8d5f0a;
+}
+
+.status-pill.atendido_ia {
+  background: rgba(37, 143, 226, 0.18);
+  color: #166ab0;
+}
+
+.status-pill.escalado_humano {
+  background: rgba(216, 90, 82, 0.2);
+  color: #b23b34;
+}
+
+.status-pill.cerrado {
+  background: rgba(49, 148, 103, 0.2);
+  color: #1f7f52;
+}
+
+@media (max-width: 640px) {
+  .btn {
+    width: 100%;
+  }
+}
