@@ -354,8 +354,8 @@
 
 /* === QUICK REPLY BUTTONS === */
 .chat-quick-replies {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 6px;
   padding: var(--space-3);
   overflow-y: auto;
@@ -367,8 +367,8 @@
 
 .quick-reply-btn {
   width: 100%;
-  padding: 8px 14px;
-  font-size: 0.75rem;
+  padding: 6px 10px;
+  font-size: 0.70rem;
   font-weight: 600;
   font-family: var(--font-primary);
   border-radius: var(--radius-lg);

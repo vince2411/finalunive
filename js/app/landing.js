@@ -292,7 +292,6 @@ async function handleChatSubmit(e) {
   
   // If already escalated, don't use AI
   if (isEscalated) {
-    addSystemMessage('Tu mensaje fue enviado al asesor. Te responderá en breve.');
     saveConversation();
     return;
   }
@@ -467,10 +466,16 @@ let unsubConv = null;
 function startRealtimeListener() {
   if (unsubConv || !conversationId) return;
   
+  if (!window.dbInstance) {
+    // Wait for Firebase to initialize before setting up the listener
+    setTimeout(startRealtimeListener, 500);
+    return;
+  }
+  
   // Listen to the entire collection and filter for our conversation
   // This is more reliable than onDocumentChange when doc ID might not match
   unsubConv = onCollectionChange('conversaciones', (allConversations) => {
-    // Find our conversation — match by the 'id' field inside the document data
+    // Find our conversation - match by the 'id' field inside the document data
     const myConv = allConversations.find(c => c.id === conversationId);
     if (!myConv || !myConv.messages) return;
     

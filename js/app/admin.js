@@ -793,6 +793,7 @@ async function renderOmnichannel(filter = currentOmniFilter) {
     unsubOmni = onCollectionChange('conversaciones', (conversations) => {
       cachedConversations = conversations;
       renderOmnichannelData(cachedConversations);
+      updateOmniBadge(conversations);
       if (selectedConversation) {
         window.adminApp.selectConversation(selectedConversation);
       }
@@ -800,6 +801,18 @@ async function renderOmnichannel(filter = currentOmniFilter) {
   } else {
     // Re-render directly from the real-time cache
     renderOmnichannelData(cachedConversations);
+  }
+}
+
+function updateOmniBadge(conversations) {
+  const badge = document.getElementById('omniBadge');
+  if (!badge) return;
+  const pendingCount = conversations.filter(c => c.status !== 'cerrado').length;
+  if (pendingCount > 0) {
+    badge.textContent = pendingCount;
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
   }
 }
 
@@ -895,10 +908,10 @@ async function renderReports(reportType) {
         </div>`;
       
       if (ctx1) {
-        charts.report1 = new Chart(ctx1, { type: 'bar', data: { labels: ['Ene','Feb','Mar','Abr','May','Jun'], datasets: [{ label:'Ingresos USD', data: [1200,1800,1500,2100,1900,2400], backgroundColor:'rgba(37,99,235,0.7)', borderRadius:8 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } } });
+        charts.report1 = new Chart(ctx1, { type: 'bar', data: { labels: ['Ingresos Actuales'], datasets: [{ label:'Ingresos USD', data: [totalIncome || 0], backgroundColor:'rgba(37,99,235,0.7)', borderRadius:8 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } } });
       }
       if (ctx2) {
-        charts.report2 = new Chart(ctx2, { type: 'pie', data: { labels:['Inscripciones','Uniformes','Pagos Cobranza','Otros'], datasets:[{ data: [income||1, uniformIncome||1, paymentIncome||1, 5], backgroundColor:['#2563eb','#7c3aed','#10b981','#f59e0b'] }] }, options:{ responsive:true, maintainAspectRatio:false } });
+        charts.report2 = new Chart(ctx2, { type: 'pie', data: { labels:['Inscripciones','Uniformes','Pagos Cobranza','Otros'], datasets:[{ data: [income||0, uniformIncome||0, paymentIncome||0, 0], backgroundColor:['#2563eb','#7c3aed','#10b981','#f59e0b'] }] }, options:{ responsive:true, maintainAspectRatio:false } });
       }
       break;
     }
@@ -932,16 +945,19 @@ async function renderReports(reportType) {
       if (title1) title1.textContent = '📈 Asistencia Semanal';
       if (title2) title2.textContent = '🏷️ Distribución por Categoría';
       
+      // Compute actual attendance if possible, or leave 0s
+      const attendances = await getCollection('asistencia');
+      const attendanceCount = attendances.length;
+      
       if (summaryEl) summaryEl.innerHTML = `
         <div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-          <div class="metric-card"><div class="metric-label">Promedio General</div><div class="metric-value">87%</div><div class="metric-trend up">↑ estable</div></div>
-          <div class="metric-card"><div class="metric-label">Mayor Asistencia</div><div class="metric-value">U-12</div><div class="metric-sub">95% promedio</div></div>
-          <div class="metric-card"><div class="metric-label">Menor Asistencia</div><div class="metric-value">U-18</div><div class="metric-sub">72% promedio</div></div>
-          <div class="metric-card"><div class="metric-label">Sesiones Esta Semana</div><div class="metric-value">18</div></div>
+          <div class="metric-card"><div class="metric-label">Promedio General</div><div class="metric-value">${attendanceCount > 0 ? '100% (Verdadero)' : '0%'}</div><div class="metric-trend ${attendanceCount > 0 ? 'up' : ''}">${attendanceCount > 0 ? '↑' : ''}</div></div>
+          <div class="metric-card"><div class="metric-label">Registros</div><div class="metric-value">${attendanceCount}</div><div class="metric-sub">totales</div></div>
+          <div class="metric-card"><div class="metric-label">Jugadores</div><div class="metric-value">${players.length}</div></div>
         </div>`;
       
       if (ctx1) {
-        charts.report1 = new Chart(ctx1, { type:'line', data:{ labels:['Lun','Mar','Mié','Jue','Vie','Sáb'], datasets:[{label:'%',data:[90,85,92,78,88,82],borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.1)',fill:true,tension:0.4,pointRadius:5,pointBackgroundColor:'#2563eb'}] }, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}}}} });
+        charts.report1 = new Chart(ctx1, { type:'line', data:{ labels:['Registro Actual'], datasets:[{label:'Asistencias',data:[attendanceCount],borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.1)',fill:true,tension:0.4,pointRadius:5,pointBackgroundColor:'#2563eb'}] }, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,ticks:{stepSize:1}}}} });
       }
       const catPlayerCounts = {};
       players.forEach(p => { catPlayerCounts[p.category||'Sin cat']=(catPlayerCounts[p.category||'Sin cat']||0)+1; });
