@@ -3,7 +3,7 @@
  * Main entry point for the admin panel: auth, navigation, modules, theme
  */
 import { initFirebase, signIn, signOut, onAuthChange } from '../services/firebase.service.js';
-import { getCollection, addDocument, updateDocument, deleteDocument, onCollectionChange } from '../services/firebase.service.js';
+import { getCollection, addDocument, updateDocument, deleteDocument, setDocument, onCollectionChange } from '../services/firebase.service.js';
 import { initBCVRate, refreshRate, getRate, getRateInfo, onRateChange, setManualRate, usdToVes, formatUSD, formatVES, formatBimoneda, formatRate } from '../services/bcv.service.js';
 import { initNotifications, getNotifications, getUnreadCount, markAllAsRead, createNotification, onNotificationChange, getNotificationIcon, getNotificationColor, notifyNewPayment, notifyEscalation } from '../services/notifications.service.js';
 import { showToast, openModal, closeModal, setupModalClose, confirmDialog, showLoader, showEmptyState, formatDate, formatTime, formatDateTime, timeAgo, calculateAge, generateId, escapeHtml, debounce, truncate, getInitials, formatWhatsAppUrl, copyToClipboard, downloadCSV, setActiveSection } from '../utils/ui.helpers.js';
@@ -308,6 +308,7 @@ async function loadSectionData(sectionId) {
     case 'section-morosidad': await renderDebtors(); break;
     case 'section-omnicanal': await renderOmnichannel(); break;
     case 'section-reportes': await renderReports(); break;
+    case 'section-config': await loadChannelStatuses(); break;
   }
 }
 
@@ -320,6 +321,7 @@ async function renderDashboard() {
   const debtors = await getCollection('morosos');
   const payments = await getCollection('historial_pagos');
   const players = await getCollection('jugadores');
+  const attendances = await getCollection('asistencia');
   
   // Calculate metrics
   const totalIncome = inscriptions
@@ -333,13 +335,21 @@ async function renderDashboard() {
   
   const pendingCount = debtors.filter(d => d.status !== 'pagado').length;
   
+  // Calculate real attendance percentage
+  let attendancePercent = '0%';
+  if (players.length > 0 && attendances.length > 0) {
+    attendancePercent = Math.round((attendances.length / players.length) * 100) + '%';
+  } else if (players.length === 0) {
+    attendancePercent = '—';
+  }
+  
   // Update metric cards
   document.getElementById('metIncome').textContent = formatUSD(totalIncome);
   document.getElementById('metIncomeVes').textContent = formatVES(totalIncome * rate);
   document.getElementById('metInscriptions').textContent = players.length;
   document.getElementById('metPending').textContent = formatUSD(totalDebt);
   document.getElementById('metPendingCount').textContent = `${pendingCount} deudores`;
-  document.getElementById('metAttendance').textContent = '87%';
+  document.getElementById('metAttendance').textContent = attendancePercent;
   
   // Render charts
   renderIncomeChart(inscriptions, payments);
@@ -355,14 +365,28 @@ function renderIncomeChart(inscriptions, payments) {
   
   if (charts.income) charts.income.destroy();
   
-  // Generate last 7 days labels
+  // Generate last 7 days labels and compute REAL income per day
   const labels = [];
   const incomeData = [];
   for (let i = 6; i >= 0; i--) {
     const date = new Date();
     date.setDate(date.getDate() - i);
-    labels.push(date.toLocaleDateString('es-VE', { weekday: 'short', day: 'numeric' }));
-    incomeData.push(Math.floor(Math.random() * 200 + 50)); // Demo data
+    const dayStr = date.toLocaleDateString('es-VE', { weekday: 'short', day: 'numeric' });
+    labels.push(dayStr);
+    
+    // Sum inscriptions paid on this day
+    const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+    const dayEnd = dayStart + 86400000;
+    
+    const inscIncome = inscriptions
+      .filter(ins => ins.status === 'pagada' && ins.createdAt >= dayStart && ins.createdAt < dayEnd)
+      .reduce((s, ins) => s + (parseFloat(ins.amountUsd) || 0), 0);
+    
+    const payIncome = payments
+      .filter(p => p.createdAt >= dayStart && p.createdAt < dayEnd)
+      .reduce((s, p) => s + (parseFloat(p.amountUsd) || 0), 0);
+    
+    incomeData.push(inscIncome + payIncome);
   }
   
   charts.income = new Chart(ctx, {
@@ -406,8 +430,8 @@ function renderCategoryChart(players) {
     catCounts[cat] = (catCounts[cat] || 0) + 1;
   });
   
-  const labels = Object.keys(catCounts).length ? Object.keys(catCounts) : ['U-8', 'U-10', 'U-12', 'U-14', 'U-16', 'U-18'];
-  const data = Object.keys(catCounts).length ? Object.values(catCounts) : [12, 18, 22, 15, 10, 8];
+  const labels = Object.keys(catCounts).length ? Object.keys(catCounts) : ['Sin datos'];
+  const data = Object.keys(catCounts).length ? Object.values(catCounts) : [0];
   
   charts.categories = new Chart(ctx, {
     type: 'doughnut',
@@ -1777,6 +1801,37 @@ window.adminApp = {
     const invoices = await getCollection('facturas');
     const inv = invoices.find(i => i.id === id);
     if (inv) generatePDF(inv);
+  },
+  
+  // Channel config
+  openChannelConfig: async (channel) => {
+    const channelNames = { whatsapp: 'WhatsApp', instagram: 'Instagram', facebook: 'Facebook' };
+    document.getElementById('channelConfigTitle').textContent = `Configurar ${channelNames[channel] || channel}`;
+    document.getElementById('channelConfigName').value = channel;
+    document.getElementById('channelAccessToken').value = '';
+    document.getElementById('channelPhoneId').value = '';
+    document.getElementById('channelPageId').value = '';
+    document.getElementById('channelConfigStatus').innerHTML = '';
+    
+    // Show/hide fields based on channel
+    document.getElementById('channelPhoneGroup').style.display = channel === 'whatsapp' ? '' : 'none';
+    document.getElementById('channelPageGroup').style.display = channel !== 'whatsapp' ? '' : 'none';
+    
+    // Load existing config if any
+    try {
+      const configs = await getCollection('configuracion');
+      const existing = configs.find(c => c.id === `channel_${channel}`);
+      if (existing) {
+        document.getElementById('channelAccessToken').value = existing.accessToken || '';
+        document.getElementById('channelPhoneId').value = existing.phoneNumberId || '';
+        document.getElementById('channelPageId').value = existing.pageId || '';
+        document.getElementById('channelConfigStatus').innerHTML = `<div class="badge badge-success">✅ Configurado previamente</div>`;
+      }
+    } catch (e) {
+      console.warn('[Config] Could not load channel config:', e);
+    }
+    
+    openModal('channelConfigModal');
   }
 };
 
@@ -1832,21 +1887,137 @@ document.getElementById('takeControlBtn')?.addEventListener('click', async () =>
   document.getElementById('takeControlBtn')?.classList.add('hidden');
 });
 
-// Close conversation
+// Close conversation — opens modal with options
 document.getElementById('closeConvBtn')?.addEventListener('click', () => {
   if (!selectedConversation) return;
-  
-  confirmDialog('Cerrar conversación', '¿Estás seguro?', async () => {
-    await updateDocument('conversaciones', selectedConversation, {
-      status: 'cerrado',
-      updatedAt: Date.now()
-    });
-    
-    showToast('Cerrada', 'Conversación cerrada', 'success');
-    selectedConversation = null;
-    await renderOmnichannel();
-  });
+  openModal('closeConvModal');
 });
+
+// Close conv modal — Close button (keep in history)
+document.getElementById('closeConvCloseBtn')?.addEventListener('click', async () => {
+  if (!selectedConversation) return;
+  
+  await updateDocument('conversaciones', selectedConversation, {
+    status: 'cerrado',
+    updatedAt: Date.now()
+  });
+  
+  closeModal('closeConvModal');
+  showToast('Cerrada', 'Conversación cerrada y archivada', 'success');
+  selectedConversation = null;
+  resetChatPanel();
+  await renderOmnichannel();
+});
+
+// Close conv modal — Delete button (permanent)
+document.getElementById('closeConvDeleteBtn')?.addEventListener('click', async () => {
+  if (!selectedConversation) return;
+  
+  await deleteDocument('conversaciones', selectedConversation);
+  
+  closeModal('closeConvModal');
+  showToast('Eliminada', 'Conversación eliminada permanentemente', 'success');
+  selectedConversation = null;
+  resetChatPanel();
+  await renderOmnichannel();
+});
+
+function resetChatPanel() {
+  document.getElementById('chatPanelName').textContent = 'Selecciona una conversación';
+  document.getElementById('chatPanelStatus').textContent = '—';
+  document.getElementById('chatPanelAvatar').textContent = '💬';
+  document.getElementById('takeControlBtn')?.classList.add('hidden');
+  document.getElementById('closeConvBtn')?.classList.add('hidden');
+  const input = document.getElementById('advisorChatInput');
+  const sendBtn = document.querySelector('#advisorChatForm button[type="submit"]');
+  if (input) { input.disabled = true; input.value = ''; }
+  if (sendBtn) sendBtn.disabled = true;
+  const thread = document.getElementById('chatThread');
+  if (thread) thread.innerHTML = `
+    <div class="empty-state">
+      <div class="empty-state-icon">💬</div>
+      <div class="empty-state-title">Selecciona una conversación</div>
+      <div class="empty-state-text">Haz clic en una conversación de la lista para ver los mensajes</div>
+    </div>
+  `;
+}
+
+// Channel config save
+document.getElementById('saveChannelConfigBtn')?.addEventListener('click', async () => {
+  const channel = document.getElementById('channelConfigName').value;
+  const accessToken = document.getElementById('channelAccessToken').value.trim();
+  const phoneNumberId = document.getElementById('channelPhoneId').value.trim();
+  const pageId = document.getElementById('channelPageId').value.trim();
+  
+  if (!accessToken) {
+    showToast('Error', 'El token de acceso es obligatorio', 'error');
+    return;
+  }
+  
+  const configData = {
+    channel,
+    accessToken,
+    phoneNumberId: channel === 'whatsapp' ? phoneNumberId : '',
+    pageId: channel !== 'whatsapp' ? pageId : '',
+    active: true,
+    configuredAt: Date.now(),
+    updatedAt: Date.now()
+  };
+  
+  await setDocument('configuracion', `channel_${channel}`, configData);
+  
+  // Update badge in UI
+  const badge = document.getElementById(`channelBadge-${channel}`);
+  if (badge) {
+    badge.textContent = 'Activo';
+    badge.className = 'badge badge-success';
+  }
+  
+  // Update the configure button
+  const card = document.getElementById(`channelCard-${channel}`);
+  if (card) {
+    const btn = card.querySelector('button');
+    if (btn) {
+      btn.textContent = '✅ Configurado';
+      btn.className = 'btn btn-sm btn-success w-full';
+    }
+  }
+  
+  closeModal('channelConfigModal');
+  showToast('Guardado', `Canal ${channel} configurado correctamente`, 'success');
+});
+
+// Load channel statuses on config section load
+async function loadChannelStatuses() {
+  const channels = ['whatsapp', 'instagram', 'facebook'];
+  try {
+    const configs = await getCollection('configuracion');
+    channels.forEach(ch => {
+      const cfg = configs.find(c => c.id === `channel_${ch}`);
+      const badge = document.getElementById(`channelBadge-${ch}`);
+      const card = document.getElementById(`channelCard-${ch}`);
+      if (cfg && cfg.active && cfg.accessToken) {
+        if (badge) {
+          badge.textContent = 'Activo';
+          badge.className = 'badge badge-success';
+        }
+        if (card) {
+          const btn = card.querySelector('button');
+          if (btn) {
+            btn.textContent = '✅ Configurado';
+            btn.className = 'btn btn-sm btn-success w-full';
+          }
+        }
+      }
+    });
+  } catch (e) {
+    console.warn('[Config] Could not load channel statuses:', e);
+  }
+}
+
+// Setup new modals
+setupModalClose('closeConvModal');
+setupModalClose('channelConfigModal');
 
 // Attendance save
 document.getElementById('saveAttendanceBtn')?.addEventListener('click', () => {

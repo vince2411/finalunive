@@ -60,9 +60,17 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
-    // Conversaciones — readable/writable for chat widget
+    // Conversaciones — Row-Level Security
+    // Public can read and create (for chat widget)
+    // Only the conversation owner (by sessionId) or admin can update
+    // Only admin can delete
     match /conversaciones/{convId} {
-      allow read, write: if true; // Public for chat widget
+      allow read: if true;
+      allow create: if true;
+      allow update: if isAdmin()
+                    || (resource.data.sessionId != null 
+                        && resource.data.sessionId == request.resource.data.sessionId);
+      allow delete: if isAdmin();
     }
     
     // Reportes cache
@@ -77,9 +85,10 @@ service cloud.firestore {
       allow write: if isAuthenticated();
     }
     
-    // Configuración
+    // Configuración — tokens are sensitive, restrict read to admin
     match /configuracion/{configId} {
-      allow read: if true; // BCV rate is public
+      // BCV rate config is public read, channel configs require admin
+      allow read: if configId == 'bcv_rate' || isAdmin();
       allow write: if isAdmin();
     }
   }

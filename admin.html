@@ -922,35 +922,35 @@
           <div class="card">
             <h4 class="card-title mb-4">Integración de Canales</h4>
             <div class="grid-2" style="max-width: 800px;">
-              <div class="category-card">
+              <div class="category-card" id="channelCard-whatsapp">
                 <div class="category-card-header">
                   <span class="category-name">💬 WhatsApp</span>
-                  <span class="badge badge-warning">Pendiente</span>
+                  <span class="badge badge-warning" id="channelBadge-whatsapp">Pendiente</span>
                 </div>
                 <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3);">
-                  Requiere WhatsApp Business API
+                  WhatsApp Business API (Meta)
                 </p>
-                <button class="btn btn-sm btn-outline w-full">Configurar</button>
+                <button class="btn btn-sm btn-outline w-full" onclick="window.adminApp.openChannelConfig('whatsapp')">Configurar</button>
               </div>
-              <div class="category-card">
+              <div class="category-card" id="channelCard-instagram">
                 <div class="category-card-header">
                   <span class="category-name">📸 Instagram</span>
-                  <span class="badge badge-warning">Pendiente</span>
+                  <span class="badge badge-warning" id="channelBadge-instagram">Pendiente</span>
                 </div>
                 <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3);">
-                  Requiere Instagram Messaging API
+                  Instagram Messaging API (Meta)
                 </p>
-                <button class="btn btn-sm btn-outline w-full">Configurar</button>
+                <button class="btn btn-sm btn-outline w-full" onclick="window.adminApp.openChannelConfig('instagram')">Configurar</button>
               </div>
-              <div class="category-card">
+              <div class="category-card" id="channelCard-facebook">
                 <div class="category-card-header">
                   <span class="category-name">👤 Facebook</span>
-                  <span class="badge badge-warning">Pendiente</span>
+                  <span class="badge badge-warning" id="channelBadge-facebook">Pendiente</span>
                 </div>
                 <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3);">
-                  Requiere Facebook Messenger API
+                  Facebook Messenger API (Meta)
                 </p>
-                <button class="btn btn-sm btn-outline w-full">Configurar</button>
+                <button class="btn btn-sm btn-outline w-full" onclick="window.adminApp.openChannelConfig('facebook')">Configurar</button>
               </div>
               <div class="category-card">
                 <div class="category-card-header">
@@ -1351,6 +1351,63 @@
       <div class="modal-footer">
         <button class="btn btn-outline" data-modal-close>Cancelar</button>
         <button id="saveUniformSaleBtn" class="btn btn-primary">Confirmar Venta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CLOSE CONVERSATION MODAL ===== -->
+  <div id="closeConvModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3>💬 Gestionar Conversación</h3>
+        <button class="btn-icon btn-ghost" data-modal-close aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: var(--space-4);">¿Qué deseas hacer con esta conversación?</p>
+        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+          <button id="closeConvCloseBtn" class="btn btn-outline" style="width: 100%; justify-content: flex-start; gap: 8px;">
+            🔒 Cerrar conversación
+            <small style="color: var(--color-text-muted); margin-left: auto;">Se mantiene en historial</small>
+          </button>
+          <button id="closeConvDeleteBtn" class="btn btn-outline" style="width: 100%; justify-content: flex-start; gap: 8px; border-color: var(--color-error); color: var(--color-error);">
+            🗑️ Eliminar conversación
+            <small style="color: var(--color-error); margin-left: auto;">Acción permanente</small>
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-modal-close>Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHANNEL CONFIG MODAL ===== -->
+  <div id="channelConfigModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 id="channelConfigTitle">Configurar Canal</h3>
+        <button class="btn-icon btn-ghost" data-modal-close aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="channelConfigName">
+        <div class="form-group">
+          <label class="form-label">Token de Acceso (Access Token)</label>
+          <input id="channelAccessToken" type="text" class="form-input" placeholder="Pegar token de Meta Business Suite...">
+          <small class="text-muted">Obtenlo desde developers.facebook.com → Tu App → Graph API Explorer</small>
+        </div>
+        <div class="form-group" id="channelPhoneGroup">
+          <label class="form-label">Phone Number ID <small>(solo WhatsApp)</small></label>
+          <input id="channelPhoneId" type="text" class="form-input" placeholder="Ej: 100234567890">
+        </div>
+        <div class="form-group" id="channelPageGroup">
+          <label class="form-label">Page ID <small>(Facebook / Instagram)</small></label>
+          <input id="channelPageId" type="text" class="form-input" placeholder="Ej: 200345678901">
+        </div>
+        <div id="channelConfigStatus" style="margin-top: var(--space-3);"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-modal-close>Cancelar</button>
+        <button id="saveChannelConfigBtn" class="btn btn-primary">💾 Guardar y Activar</button>
       </div>
     </div>
   </div>
