@@ -2,8 +2,8 @@
  * Landing Page Controller — Universitarios FC v2.0
  * Handles chat widget, Groq AI integration, quick replies, and mobile navigation
  */
-import { initFirebase } from '../services/firebase.service.js';
-import { setDocument, getCollection, updateDocument, onCollectionChange } from '../services/firebase.service.js';
+import { initFirebase, isFirebaseReady } from '../services/firebase.service.js';
+import { setDocument, getCollection, updateDocument, onDocumentChange, onCollectionChange } from '../services/firebase.service.js';
 import { chatWithGroq, buildGroqHistory, isEscalationRequest } from '../services/groq.service.js';
 import { showToast, escapeHtml, formatTime, generateId, timeAgo } from '../utils/ui.helpers.js';
 
@@ -14,6 +14,8 @@ let conversationId = null;
 let isEscalated = false;
 let isTyping = false;
 let aiMessageCount = 0;
+let unsubConv = null;
+let lastRenderedCount = 0;
 
 // ==================== PREDEFINED RESPONSES ====================
 const PREDEFINED_RESPONSES = {
@@ -81,9 +83,15 @@ function initHeaderScroll() {
   const header = document.getElementById('landingHeader');
   if (!header) return;
   
+  let ticking = false;
   window.addEventListener('scroll', () => {
-    const scrollY = window.scrollY;
-    header.style.boxShadow = scrollY > 50 ? 'var(--shadow-md)' : 'none';
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        header.style.boxShadow = window.scrollY > 50 ? 'var(--shadow-md)' : 'none';
+        ticking = false;
+      });
+      ticking = true;
+    }
   });
 }
 
@@ -150,7 +158,6 @@ function hideQuickReplies() {
 }
 
 function showQuickReplies() {
-  // We no longer aggressively auto-show quick replies.
   // The '3 dots' button manages the toggle now.
 }
 
@@ -190,11 +197,18 @@ window.startNewChat = function() {
   const sessionMenu = document.getElementById('chatSessionMenu');
   if (sessionMenu) sessionMenu.classList.add('hidden');
   
+  // Unsubscribe from previous conversation listener
+  if (unsubConv) {
+    unsubConv();
+    unsubConv = null;
+  }
+  
   // Clear conversation state
   messages = [];
   conversationId = null;
   isEscalated = false;
   aiMessageCount = 0;
+  lastRenderedCount = 0;
   localStorage.removeItem('ufc_web_conversation');
   
   // Clear UI
@@ -290,7 +304,7 @@ async function handleChatSubmit(e) {
     return;
   }
   
-  // If already escalated, don't use AI
+  // If already escalated, just save to Firestore so advisor sees new messages
   if (isEscalated) {
     saveConversation();
     return;
@@ -349,6 +363,7 @@ async function handleChatSubmit(e) {
 function addUserMessage(text) {
   const msg = { id: generateId('msg'), sender: 'customer', text, timestamp: Date.now() };
   messages.push(msg);
+  lastRenderedCount = messages.length;
   renderMessage(msg);
   scrollChatToBottom();
 }
@@ -356,6 +371,7 @@ function addUserMessage(text) {
 function addBotMessage(text) {
   const msg = { id: generateId('msg'), sender: 'ai', text, timestamp: Date.now() };
   messages.push(msg);
+  lastRenderedCount = messages.length;
   renderMessage(msg);
   scrollChatToBottom();
 }
@@ -363,6 +379,7 @@ function addBotMessage(text) {
 function addSystemMessage(text) {
   const msg = { id: generateId('msg'), sender: 'system', text, timestamp: Date.now() };
   messages.push(msg);
+  lastRenderedCount = messages.length;
   renderMessage(msg);
   scrollChatToBottom();
 }
@@ -400,12 +417,13 @@ function renderAllMessages() {
   if (!container) return;
   container.innerHTML = '';
   messages.forEach(msg => renderMessage(msg));
+  lastRenderedCount = messages.length;
 }
 
 function scrollChatToBottom() {
   const container = document.getElementById('chatMessages');
   if (container) {
-    setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
+    requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
   }
 }
 
@@ -449,7 +467,6 @@ function handleEscalation() {
     headerText.innerHTML = '<span class="online-dot" style="background: var(--color-warning);"></span> Esperando asesor...';
   }
   
-  saveEscalation();
   saveConversation();
 }
 
@@ -460,34 +477,61 @@ function showEscalationBanner() {
   }
 }
 
-// ==================== PERSISTENCE ====================
-let unsubConv = null;
+// ==================== REAL-TIME SYNC ====================
 
+/**
+ * Start a real-time Firestore listener on this specific conversation.
+ * When the advisor sends a message from admin panel, it is detected here
+ * and rendered immediately in the user's chat widget.
+ */
 function startRealtimeListener() {
   if (unsubConv || !conversationId) return;
   
-  if (!window.dbInstance) {
-    // Wait for Firebase to initialize before setting up the listener
-    setTimeout(startRealtimeListener, 500);
+  // Check Firebase is ready using the exported function, not window.dbInstance
+  if (!isFirebaseReady()) {
+    setTimeout(startRealtimeListener, 300);
     return;
   }
   
-  // Listen to the entire collection and filter for our conversation
-  // This is more reliable than onDocumentChange when doc ID might not match
+  // Listen to the ENTIRE conversaciones collection and filter for ours.
+  // This works because onCollectionChange uses .onSnapshot at collection level.
   unsubConv = onCollectionChange('conversaciones', (allConversations) => {
-    // Find our conversation - match by the 'id' field inside the document data
     const myConv = allConversations.find(c => c.id === conversationId);
     if (!myConv || !myConv.messages) return;
     
-    if (myConv.messages.length > messages.length) {
-      const newMsgs = myConv.messages.slice(messages.length);
-      messages = myConv.messages;
+    const serverMsgCount = myConv.messages.length;
+    
+    // Only act if the server has more messages than what we've rendered
+    if (serverMsgCount > lastRenderedCount) {
+      // Get only the new messages we haven't rendered yet
+      const newMsgs = myConv.messages.slice(lastRenderedCount);
+      
+      // Update local state
+      messages = [...myConv.messages];
+      lastRenderedCount = serverMsgCount;
+      
+      // Render ONLY the new messages (append, don't re-render all)
       newMsgs.forEach(msg => renderMessage(msg));
       scrollChatToBottom();
+      
+      // Update escalation state from server
+      if (myConv.status === 'escalado_humano' && !isEscalated) {
+        isEscalated = true;
+        const headerText = document.querySelector('.chat-header-text span');
+        if (headerText) {
+          headerText.innerHTML = '<span class="online-dot" style="background: var(--color-success);"></span> Asesor conectado';
+        }
+      }
+      
+      // Persist to localStorage
       localStorage.setItem('ufc_web_conversation', JSON.stringify(myConv));
     }
   });
+  
+  console.log('[Chat] Real-time listener started for conversation:', conversationId);
 }
+
+// ==================== PERSISTENCE ====================
 
 function saveConversation() {
   const data = {
@@ -506,10 +550,12 @@ function saveConversation() {
     data.createdAt = Date.now();
   }
   
+  // Update the last rendered count to match what we just saved
+  lastRenderedCount = messages.length;
+  
   localStorage.setItem('ufc_web_conversation', JSON.stringify(data));
   
-  // Use setDocument so the Firestore doc ID === conversationId
-  // This is the critical fix: .doc(conversationId).set(data, {merge: true})
+  // Persist to Firestore so admin panel sees the conversation
   try {
     setDocument('conversaciones', conversationId, data, true).catch(() => {});
     
@@ -548,8 +594,3 @@ function loadConversation() {
     // Start fresh
   }
 }
-
-function saveEscalation() {
-  saveConversation();
-}
-

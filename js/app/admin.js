@@ -808,6 +808,7 @@ async function renderDebtors() {
 let currentOmniFilter = 'all';
 let unsubOmni = null;
 let cachedConversations = [];
+let adminRenderedMsgCount = 0;
 
 // ==================== OMNICHANNEL MODULE ====================
 async function renderOmnichannel(filter = currentOmniFilter) {
@@ -818,14 +819,56 @@ async function renderOmnichannel(filter = currentOmniFilter) {
       cachedConversations = conversations;
       renderOmnichannelData(cachedConversations);
       updateOmniBadge(conversations);
+      
+      // Smart update: only re-render messages if there are new ones
       if (selectedConversation) {
-        window.adminApp.selectConversation(selectedConversation);
+        updateSelectedChatThread();
       }
     });
   } else {
     // Re-render directly from the real-time cache
     renderOmnichannelData(cachedConversations);
   }
+}
+
+/**
+ * Smart chat thread update — only appends new messages instead of
+ * re-rendering the entire thread. Prevents scroll jumps and flicker.
+ */
+function updateSelectedChatThread() {
+  const conv = cachedConversations.find(c => c.id === selectedConversation);
+  if (!conv || !conv.messages) return;
+  
+  const thread = document.getElementById('chatThread');
+  if (!thread) return;
+  
+  const serverCount = conv.messages.length;
+  
+  // If server has MORE messages than what we've rendered, append them
+  if (serverCount > adminRenderedMsgCount) {
+    const newMsgs = conv.messages.slice(adminRenderedMsgCount);
+    const senderLabels = { customer: 'Cliente', ai: '🤖 UniBot', advisor: '👤 Asesor', system: 'Sistema' };
+    
+    newMsgs.forEach(m => {
+      const senderClass = m.sender === 'customer' ? 'customer' : m.sender === 'ai' ? 'ai' : m.sender === 'advisor' ? 'advisor' : 'system';
+      const div = document.createElement('div');
+      div.className = `chat-message ${senderClass}`;
+      div.innerHTML = `
+        <div class="chat-message-sender">${senderLabels[m.sender] || m.sender}</div>
+        ${escapeHtml(m.text)}
+        <div class="chat-message-time">${m.timestamp ? formatTime(m.timestamp) : ''}</div>
+      `;
+      thread.appendChild(div);
+    });
+    
+    adminRenderedMsgCount = serverCount;
+    thread.scrollTop = thread.scrollHeight;
+  }
+  
+  // Update header status
+  document.getElementById('chatPanelStatus').textContent = `${conv.channel || 'web'} · ${conv.status || 'pendiente'}`;
+  document.getElementById('takeControlBtn')?.classList.toggle('hidden', conv.status === 'escalado_humano');
+  document.getElementById('closeConvBtn')?.classList.toggle('hidden', conv.status === 'cerrado');
 }
 
 function updateOmniBadge(conversations) {
@@ -1778,8 +1821,8 @@ window.adminApp = {
     // Render messages
     const thread = document.getElementById('chatThread');
     if (thread && conv.messages) {
+      const senderLabels = { customer: 'Cliente', ai: '🤖 UniBot', advisor: '👤 Asesor', system: 'Sistema' };
       thread.innerHTML = conv.messages.map(m => {
-        const senderLabels = { customer: 'Cliente', ai: '🤖 UniBot', advisor: '👤 Asesor', system: 'Sistema' };
         const senderClass = m.sender === 'customer' ? 'customer' : m.sender === 'ai' ? 'ai' : m.sender === 'advisor' ? 'advisor' : 'system';
         
         return `
@@ -1791,6 +1834,8 @@ window.adminApp = {
         `;
       }).join('');
       
+      // Track how many messages are currently rendered
+      adminRenderedMsgCount = conv.messages.length;
       thread.scrollTop = thread.scrollHeight;
     }
   },
@@ -1923,6 +1968,7 @@ document.getElementById('closeConvDeleteBtn')?.addEventListener('click', async (
 });
 
 function resetChatPanel() {
+  adminRenderedMsgCount = 0;
   document.getElementById('chatPanelName').textContent = 'Selecciona una conversación';
   document.getElementById('chatPanelStatus').textContent = '—';
   document.getElementById('chatPanelAvatar').textContent = '💬';
