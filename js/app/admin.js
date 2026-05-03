@@ -10,7 +10,7 @@ import { showToast, openModal, closeModal, setupModalClose, confirmDialog, showL
 
 // ==================== STATE ====================
 let currentSection = 'section-dashboard';
-let currentTheme = localStorage.getItem('ufc_theme') || 'light';
+let currentTheme = localStorage.getItem('ufc_theme') || 'dark';
 let selectedConversation = null;
 let charts = {};
 
